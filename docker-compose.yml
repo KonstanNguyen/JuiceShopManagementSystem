@@ -39,14 +39,30 @@ services:
     networks:
       - app-network
 
+#  user-service:
+#    image: ghcr.io/phuongp2003/juiceshop_user:latest
+#    container_name: user_service
+#    restart: always
+#    env_file:
+#      - user.env
+#    ports:
+#      - "21501:21501"
+#    networks:
+#      - app-network
+
   user-service:
-    image: ghcr.io/phuongp2003/juiceshop_user:latest
+    build:
+      context: ./user-service   # trỏ thẳng tới submodule
+      dockerfile: Dockerfile    # nếu Dockerfile tên khác mặc định
     container_name: user_service
     restart: always
     env_file:
       - user.env
     ports:
       - "21501:21501"
+    depends_on:
+      - keycloak-db
+      - keycloak
     networks:
       - app-network
 
