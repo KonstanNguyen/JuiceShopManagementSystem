@@ -39,32 +39,32 @@ services:
     networks:
       - app-network
 
-#  user-service:
-#    image: ghcr.io/phuongp2003/juiceshop_user:latest
-#    container_name: user_service
-#    restart: always
-#    env_file:
-#      - user.env
-#    ports:
-#      - "21501:21501"
-#    networks:
-#      - app-network
-
   user-service:
-    build:
-      context: ./user-service   # trỏ thẳng tới submodule
-      dockerfile: Dockerfile    # nếu Dockerfile tên khác mặc định
+    image: ghcr.io/phuongp2003/juiceshop_user:latest
     container_name: user_service
     restart: always
     env_file:
       - user.env
     ports:
       - "21501:21501"
-    depends_on:
-      - keycloak-db
-      - keycloak
     networks:
       - app-network
+
+#  user-service:
+#    build:
+#      context: ./user-service   # trỏ thẳng tới submodule
+#      dockerfile: Dockerfile    # nếu Dockerfile tên khác mặc định
+#    container_name: user_service
+#    restart: always
+#    env_file:
+#      - user.env
+#    ports:
+#      - "21501:21501"
+#    depends_on:
+#      - keycloak-db
+#      - keycloak
+#    networks:
+#      - app-network
 
   api-gateway:
     image: ghcr.io/konstannguyen/juiceshop_gateway:latest
@@ -77,6 +77,14 @@ services:
     networks:
       - app-network
 
+  front-end:
+    image: ghcr.io/konstannguyen/juiceshop_frontend:latest
+    container_name: front_end
+    restart: always
+    ports:
+      - "5173:80"
+    networks:
+      - app-network
 
 networks:
   app-network:
