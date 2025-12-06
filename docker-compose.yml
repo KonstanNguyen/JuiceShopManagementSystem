@@ -1,5 +1,18 @@
 services:
 
+  keycloak-db:
+    image: postgres:16
+    container_name: keycloak_db
+    restart: always
+    env_file:
+      - keycloak.env
+    ports:
+      - "5433:5432"
+    volumes:
+      - keycloak_db_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
     container_name: keycloak
@@ -15,19 +28,6 @@ services:
     networks:
       - app-network
 
-  keycloak-db:
-    image: postgres:16
-    container_name: keycloak_db
-    restart: always
-    env_file:
-      - keycloak.env
-    ports:
-      - "5433:5432"
-    volumes:
-      - keycloak_db_data:/var/lib/postgresql/data
-    networks:
-      - app-network
-
   core-service:
     image: ghcr.io/konstannguyen/juiceshop_core_service:latest
     container_name: core_service
@@ -40,31 +40,17 @@ services:
       - app-network
 
   user-service:
-    image: ghcr.io/phuongp2003/juiceshop_user:latest
+    image: ghcr.io/konstannguyen/juiceshop_user:latest
     container_name: user_service
     restart: always
     env_file:
       - user.env
     ports:
       - "21501:21501"
+    depends_on:
+      - keycloak
     networks:
       - app-network
-
-#  user-service:
-#    build:
-#      context: ./user-service   # trỏ thẳng tới submodule
-#      dockerfile: Dockerfile    # nếu Dockerfile tên khác mặc định
-#    container_name: user_service
-#    restart: always
-#    env_file:
-#      - user.env
-#    ports:
-#      - "21501:21501"
-#    depends_on:
-#      - keycloak-db
-#      - keycloak
-#    networks:
-#      - app-network
 
   api-gateway:
     image: ghcr.io/konstannguyen/juiceshop_gateway:latest
@@ -74,6 +60,9 @@ services:
       - api_gateway.env
     ports:
       - "21500:21500"
+    depends_on:
+      - user-service
+      - core-service
     networks:
       - app-network
 
