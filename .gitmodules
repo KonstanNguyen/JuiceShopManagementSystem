@@ -1,3 +1,0 @@
-[submodule "user-service"]
-	path = user-service
-	url = git@github.com:Phuongp2003/User_service.git

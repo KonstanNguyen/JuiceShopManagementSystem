@@ -1,39 +1,15 @@
+version: "3.9"
+
+name: "services-compose"
+
 services:
-
-  keycloak-db:
-    image: postgres:16
-    container_name: keycloak_db
-    restart: always
-    env_file:
-      - keycloak.env
-    ports:
-      - "5433:5432"
-    volumes:
-      - keycloak_db_data:/var/lib/postgresql/data
-    networks:
-      - app-network
-
-  keycloak:
-    image: quay.io/keycloak/keycloak:26.0
-    container_name: keycloak
-    restart: always
-    command:
-      - start-dev
-    env_file:
-      - keycloak.env
-    ports:
-      - "8081:8080"   # Keycloak exposed port on host
-    depends_on:
-      - keycloak-db
-    networks:
-      - app-network
 
   core-service:
     image: ghcr.io/konstannguyen/juiceshop_core_service:latest
     container_name: core_service
     restart: always
     env_file:
-      - core_service.env
+      - environments/core_service.env
     ports:
       - "8082:8082"
     networks:
@@ -44,11 +20,9 @@ services:
     container_name: user_service
     restart: always
     env_file:
-      - user.env
+      - environments/user.env
     ports:
       - "21501:21501"
-    depends_on:
-      - keycloak
     networks:
       - app-network
 
@@ -57,7 +31,7 @@ services:
     container_name: api_gateway
     restart: always
     env_file:
-      - api_gateway.env
+      - environments/api_gateway.env
     ports:
       - "21500:21500"
     depends_on:
@@ -66,10 +40,14 @@ services:
     networks:
       - app-network
 
-  front-end:
-    image: ghcr.io/konstannguyen/juiceshop_frontend:latest
+  fe:
     container_name: front_end
     restart: always
+    build: ./juice-shop-fe
+    env_file:
+      - environments/front_end.env
+    volumes:
+      - ./configs/nginx.conf:/etc/nginx/conf.d/default.conf
     ports:
       - "5173:80"
     networks:
@@ -78,6 +56,3 @@ services:
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  keycloak_db_data:

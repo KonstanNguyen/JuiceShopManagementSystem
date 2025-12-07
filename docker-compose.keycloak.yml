@@ -1,0 +1,49 @@
+version: "3.9"
+
+name: "keycloak-compose"
+
+services:
+
+  keycloak-db:
+    image: postgres:16
+    container_name: keycloak_db
+    restart: always
+    env_file:
+      - environments/keycloak.env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+    volumes:
+      - keycloak_db_data:/var/lib/postgresql/data
+    networks:
+      - keycloak-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: keycloak
+    restart: always
+    command:
+      - start-dev
+      - --import-realm
+    env_file:
+      - environments/keycloak.env
+    volumes:
+      - ./configs/realm-juice-shop.json:/opt/keycloak/data/import/realm-juice-shop.json
+    ports:
+      - "8080:8080"   # Keycloak exposed port on host
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    networks:
+      - keycloak-network
+
+networks:
+  keycloak-network:
+    driver: bridge
+
+volumes:
+  keycloak_db_data:
