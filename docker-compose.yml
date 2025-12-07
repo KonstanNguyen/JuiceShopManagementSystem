@@ -1,0 +1,126 @@
+version: "3.9"
+
+services:
+
+  keycloak-db:
+    image: postgres:16
+    container_name: keycloak_db
+    restart: always
+    env_file:
+      - environments/keycloak.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - keycloak_db_data:/var/lib/postgresql/data
+    networks:
+      - keycloak-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: keycloak
+    restart: always
+    command:
+      - start-dev
+      - --import-realm
+    env_file:
+      - environments/keycloak.env
+    volumes:
+      - ./configs/realm-juice-shop.json:/opt/keycloak/data/import/realm-juice-shop.json
+    ports:
+      - "8080:8080"
+      - "9000:9000"
+    depends_on:
+      - keycloak-db
+    networks:
+      - keycloak-network
+
+  application-db:
+    image: mysql:8.0
+    container_name: mysql8
+    command:
+      - --default-authentication-plugin=mysql_native_password
+    env_file:
+      - environments/application_db.env
+    ports:
+      - '3307:3306'
+    volumes:
+      - application_db_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  core-service:
+    image: ghcr.io/konstannguyen/juiceshop_core_service:latest
+    container_name: core_service
+    restart: always
+    env_file:
+      - environments/core_service.env
+    depends_on:
+      - application-db
+    ports:
+      - "8082:8082"
+    networks:
+      - app-network
+
+  user-service:
+    image: ghcr.io/konstannguyen/juiceshop_user:latest
+    container_name: user_service
+    restart: always
+    env_file:
+      - environments/user.env
+    depends_on:
+      - application-db
+    ports:
+      - "21501:21501"
+    networks:
+      - app-network
+
+  voucher-service:
+    image: ghcr.io/nguyenphucminhkhang/juiceshop_voucher_service:latest
+    container_name: voucher_service
+    restart: always
+    env_file:
+      - environments/voucher.env
+    ports:
+      - "21502:21502"
+    depends_on:
+      - application-db
+    networks:
+      - app-network
+
+  api-gateway:
+    image: ghcr.io/konstannguyen/juiceshop_gateway:latest
+    container_name: api_gateway
+    restart: always
+    env_file:
+      - environments/api_gateway.env
+    ports:
+      - "21500:21500"
+    depends_on:
+      - user-service
+      - core-service
+      - voucher-service
+      - keycloak
+    networks:
+      - app-network
+
+  front-end:
+    image: ghcr.io/konstannguyen/juiceshop_frontend:latest
+    restart: always
+    env_file:
+      - environments/front_end.env
+    volumes:
+      - ./configs/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "5173:80"
+    networks:
+      - app-network
+
+networks:
+  keycloak-network:
+    driver: bridge
+  app-network:
+    driver: bridge
+
+volumes:
+  keycloak_db_data:
+  application_db_data:
