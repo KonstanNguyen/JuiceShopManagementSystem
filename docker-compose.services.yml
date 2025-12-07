@@ -40,10 +40,9 @@ services:
     networks:
       - app-network
 
-  fe:
-    container_name: front_end
+  front-end:
+    image: ghcr.io/konstannguyen/juiceshop_frontend:latest
     restart: always
-    build: ./juice-shop-fe
     env_file:
       - environments/front_end.env
     volumes:
