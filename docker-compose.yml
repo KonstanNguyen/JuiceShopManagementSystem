@@ -5,7 +5,7 @@ services:
   keycloak-db:
     image: postgres:16
     container_name: keycloak_db
-    restart: always
+    restart: unless-stopped
     env_file:
       - environments/keycloak.env
     ports:
@@ -18,7 +18,7 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
     container_name: keycloak
-    restart: always
+    restart: unless-stopped
     command:
       - start-dev
       - --import-realm
@@ -51,7 +51,7 @@ services:
   core-service:
     image: ghcr.io/konstannguyen/juiceshop_core_service:latest
     container_name: core_service
-    restart: always
+    restart: unless-stopped
     env_file:
       - environments/core_service.env
     depends_on:
@@ -64,7 +64,7 @@ services:
   user-service:
     image: ghcr.io/konstannguyen/juiceshop_user:latest
     container_name: user_service
-    restart: always
+    restart: unless-stopped
     env_file:
       - environments/user.env
     depends_on:
@@ -77,7 +77,7 @@ services:
   voucher-service:
     image: ghcr.io/nguyenphucminhkhang/juiceshop_voucher_service:latest
     container_name: voucher_service
-    restart: always
+    restart: unless-stopped
     env_file:
       - environments/voucher.env
     ports:
@@ -87,10 +87,26 @@ services:
     networks:
       - app-network
 
+#  api-gateway:
+#    image: ghcr.io/konstannguyen/juiceshop_gateway:latest
+#    container_name: api_gateway
+#    restart: unless-stopped
+#    env_file:
+#      - environments/api_gateway.env
+#    ports:
+#      - "21500:21500"
+#    depends_on:
+#      - user-service
+#      - core-service
+#      - voucher-service
+#      - keycloak
+#    networks:
+#      - app-network
+
   api-gateway:
-    image: ghcr.io/konstannguyen/juiceshop_gateway:latest
     container_name: api_gateway
-    restart: always
+    build: C:/Users/lop97/Documents/SourceCodes/IdeaProjects/api-gateway
+    restart: unless-stopped
     env_file:
       - environments/api_gateway.env
     ports:
@@ -105,7 +121,7 @@ services:
 
   front-end:
     image: ghcr.io/konstannguyen/juiceshop_frontend:latest
-    restart: always
+    restart: unless-stopped
     env_file:
       - environments/front_end.env
     volumes:

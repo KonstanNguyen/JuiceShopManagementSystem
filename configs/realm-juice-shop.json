@@ -115,7 +115,7 @@
       },
       {
         "id": "d3d4323d-06c9-47c3-a3fb-21a0a67d1ff2",
-        "name": "admin",
+        "name": "juice_shop_admin",
         "description": "Administrator role with elevated permissions",
         "composite": false,
         "clientRole": false,
@@ -521,8 +521,8 @@
     },
     {
       "id": "5febad67-cb73-4a80-a9d8-a17656d5c52b",
-      "username": "admin",
-      "email": "admin@gmail.com",
+      "username": "juiceshopadmin",
+      "email": "juiceshopadmin@gmail.com",
       "enabled": true,
       "emailVerified": true,
       "credentials": [
@@ -534,8 +534,10 @@
       ],
       "requiredActions": [],
       "realmRoles": [
-        "default-roles-juice-shop-keycloak",
-        "admin"
+        "juice_shop_admin",
+        "store_staff",
+        "warehouse_staff",
+        "manager"
       ],
       "clientRoles": {
         "realm-management": [
