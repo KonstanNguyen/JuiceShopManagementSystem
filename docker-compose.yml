@@ -10,6 +10,12 @@ services:
       - environments/keycloak.env
     ports:
       - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      start_period: 30s
+      interval: 10s
+      timeout: 10s
+      retries: 20
     volumes:
       - keycloak_db_data:/var/lib/postgresql/data
     networks:
@@ -29,8 +35,14 @@ services:
     ports:
       - "8080:8080"
       - "9000:9000"
+    healthcheck:
+      test: [ "CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000;echo -e 'GET /health/ready HTTP/1.1\r\nhost: http://localhost\r\nConnection: close\r\n\r\n' >&3;if [ $? -eq 0 ]; then echo 'Healthcheck Successful';exit 0;else echo 'Healthcheck Failed';exit 1;fi;" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     depends_on:
-      - keycloak-db
+      keycloak-db:
+        condition: service_healthy
     networks:
       - keycloak-network
 
@@ -43,19 +55,38 @@ services:
       - environments/application_db.env
     ports:
       - '3307:3306'
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      start_period: 30s
+      timeout: 10s
+      retries: 20
     volumes:
       - application_db_data:/var/lib/mysql
     networks:
       - app-network
 
+#  core-service:
+#    image: ghcr.io/konstannguyen/juiceshop_core_service:latest
+#    container_name: core_service
+#    restart: unless-stopped
+#    env_file:
+#      - environments/core_service.env
+#    depends_on:
+#      - application-db
+#    ports:
+#      - "8082:8082"
+#    networks:
+#      - app-network
+
   core-service:
-    image: ghcr.io/konstannguyen/juiceshop_core_service:latest
+    build: C:/Users/lop97/Documents/SourceCodes/IdeaProjects/core-service
     container_name: core_service
     restart: unless-stopped
     env_file:
       - environments/core_service.env
     depends_on:
-      - application-db
+      application-db:
+        condition: service_healthy
     ports:
       - "8082:8082"
     networks:
@@ -68,7 +99,8 @@ services:
     env_file:
       - environments/user.env
     depends_on:
-      - application-db
+      application-db:
+        condition: service_healthy
     ports:
       - "21501:21501"
     networks:
@@ -83,7 +115,8 @@ services:
     ports:
       - "21502:21502"
     depends_on:
-      - application-db
+      application-db:
+        condition: service_healthy
     networks:
       - app-network
 
@@ -112,10 +145,14 @@ services:
     ports:
       - "21500:21500"
     depends_on:
-      - user-service
-      - core-service
-      - voucher-service
-      - keycloak
+      user-service:
+        condition: service_started
+      core-service:
+        condition: service_started
+      voucher-service:
+        condition: service_started
+      keycloak:
+        condition: service_healthy
     networks:
       - app-network
 
