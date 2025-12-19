@@ -57,6 +57,15 @@
         "attributes": {}
       },
       {
+        "id": "d3d4323d-06c9-47c3-a3fb-21a0a67d1ff2",
+        "name": "juice_shop_admin",
+        "description": "Administrator role with elevated permissions",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "0083da32-ed1d-4a2f-b7c8-d714304813d7",
+        "attributes": {}
+      },
+      {
         "id": "080b9856-34f7-44ca-a393-37960e5fd7a9",
         "name": "manager",
         "description": "",
@@ -108,15 +117,6 @@
         "id": "e02ba1fa-6757-410f-9657-cdff36f8eb26",
         "name": "store_staff",
         "description": "",
-        "composite": false,
-        "clientRole": false,
-        "containerId": "0083da32-ed1d-4a2f-b7c8-d714304813d7",
-        "attributes": {}
-      },
-      {
-        "id": "d3d4323d-06c9-47c3-a3fb-21a0a67d1ff2",
-        "name": "juice_shop_admin",
-        "description": "Administrator role with elevated permissions",
         "composite": false,
         "clientRole": false,
         "containerId": "0083da32-ed1d-4a2f-b7c8-d714304813d7",
@@ -352,6 +352,7 @@
           "attributes": {}
         }
       ],
+      "user-service-admin": [],
       "account": [
         {
           "id": "afd1a6e1-7536-4db7-98f2-93a799117fed",
@@ -510,6 +511,12 @@
         "default-roles-juice-shop-keycloak"
       ],
       "clientRoles": {
+        "realm-management": [
+          "query-users",
+          "realm-admin",
+          "view-users",
+          "manage-users"
+        ],
         "account": [
           "manage-account",
           "view-profile",
@@ -520,35 +527,24 @@
       "groups": []
     },
     {
-      "id": "5febad67-cb73-4a80-a9d8-a17656d5c52b",
-      "username": "juiceshopadmin",
-      "email": "juiceshopadmin@gmail.com",
+      "id": "a4ff547c-2634-40f1-bfc9-8c16a7bbc5e0",
+      "username": "service-account-user-service-admin",
+      "emailVerified": false,
+      "createdTimestamp": 1766178701769,
       "enabled": true,
-      "emailVerified": true,
-      "credentials": [
-        {
-          "type": "password",
-          "value": "admin",
-          "temporary": false
-        }
-      ],
+      "totp": false,
+      "serviceAccountClientId": "user-service-admin",
+      "disableableCredentialTypes": [],
       "requiredActions": [],
       "realmRoles": [
-        "juice_shop_admin",
-        "store_staff",
-        "warehouse_staff",
-        "manager"
+        "default-roles-juice-shop-keycloak"
       ],
       "clientRoles": {
         "realm-management": [
           "realm-admin"
-        ],
-        "account": [
-          "manage-account",
-          "manage-account-links",
-          "view-profile"
         ]
       },
+      "notBefore": 0,
       "groups": []
     }
   ],
@@ -776,7 +772,7 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
+      "secret": "MLiqj8An4ORjfZ67sDQmdb4b5p36wSTc",
       "redirectUris": [
         "/*"
       ],
@@ -1034,6 +1030,110 @@
       ],
       "optionalClientScopes": [
         "address",
+        "phone",
+        "offline_access",
+        "organization",
+        "microprofile-jwt"
+      ]
+    },
+    {
+      "id": "aa96a5b1-1c53-467f-b105-12c4f8c03628",
+      "clientId": "user-service-admin",
+      "name": "",
+      "description": "",
+      "rootUrl": "",
+      "adminUrl": "",
+      "baseUrl": "",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "**********",
+      "redirectUris": [
+        "/*"
+      ],
+      "webOrigins": [
+        "/*"
+      ],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "frontchannelLogout": true,
+      "protocol": "openid-connect",
+      "attributes": {
+        "realm_client": "false",
+        "oidc.ciba.grant.enabled": "false",
+        "client.secret.creation.time": "1766178701",
+        "backchannel.logout.session.required": "true",
+        "oauth2.device.authorization.grant.enabled": "true",
+        "backchannel.logout.revoke.offline.tokens": "false"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "protocolMappers": [
+        {
+          "id": "86901b53-b457-4acb-be3e-048befa1ca8d",
+          "name": "Client IP Address",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.session.note": "clientAddress",
+            "id.token.claim": "true",
+            "introspection.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "clientAddress",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "id": "1b38dbd3-0d01-4086-b75f-d9b6802b9534",
+          "name": "Client Host",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.session.note": "clientHost",
+            "id.token.claim": "true",
+            "introspection.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "clientHost",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "id": "d426064f-fd28-4893-8f36-56d92db3cf65",
+          "name": "Client ID",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.session.note": "client_id",
+            "id.token.claim": "true",
+            "introspection.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "client_id",
+            "jsonType.label": "String"
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "basic",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "api-gateway-audience",
         "phone",
         "offline_access",
         "organization",
@@ -1757,14 +1857,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-address-mapper",
-            "saml-role-list-mapper",
-            "oidc-full-name-mapper",
-            "saml-user-attribute-mapper",
-            "oidc-usermodel-attribute-mapper",
             "saml-user-property-mapper",
+            "oidc-full-name-mapper",
+            "oidc-usermodel-attribute-mapper",
+            "oidc-address-mapper",
+            "saml-user-attribute-mapper",
             "oidc-sha256-pairwise-sub-mapper",
-            "oidc-usermodel-property-mapper"
+            "oidc-usermodel-property-mapper",
+            "saml-role-list-mapper"
           ]
         }
       },
@@ -1784,14 +1884,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "saml-role-list-mapper",
-            "saml-user-attribute-mapper",
-            "saml-user-property-mapper",
             "oidc-usermodel-property-mapper",
+            "saml-user-property-mapper",
+            "oidc-full-name-mapper",
+            "saml-user-attribute-mapper",
             "oidc-address-mapper",
             "oidc-sha256-pairwise-sub-mapper",
-            "oidc-full-name-mapper",
-            "oidc-usermodel-attribute-mapper"
+            "oidc-usermodel-attribute-mapper",
+            "saml-role-list-mapper"
           ]
         }
       },

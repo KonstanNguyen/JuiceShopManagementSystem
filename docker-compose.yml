@@ -65,22 +65,8 @@ services:
     networks:
       - app-network
 
-#  core-service:
-#    image: ghcr.io/konstannguyen/juiceshop_core_service:latest
-#    container_name: core_service
-#    restart: unless-stopped
-#    env_file:
-#      - environments/core_service.env
-#    depends_on:
-#      application-db:
-#        condition: service_healthy
-#    ports:
-#      - "8082:8082"
-#    networks:
-#      - app-network
-
   core-service:
-    build: C:/Users/lop97/Documents/SourceCodes/IdeaProjects/core-service
+    image: ghcr.io/konstannguyen/juiceshop_core_service:latest
     container_name: core_service
     restart: unless-stopped
     env_file:
@@ -90,8 +76,24 @@ services:
         condition: service_healthy
     ports:
       - "8082:8082"
+      - "21002:21002"
     networks:
       - app-network
+
+#  core-service:
+#    build: C:/Users/lop97/Documents/SourceCodes/IdeaProjects/core-service
+#    container_name: core_service
+#    restart: unless-stopped
+#    env_file:
+#      - environments/core_service.env
+#    depends_on:
+#      application-db:
+#        condition: service_healthy
+#    ports:
+#      - "8082:8082"
+#      - "21002:21002"
+#    networks:
+#      - app-network
 
   user-service:
     image: ghcr.io/konstannguyen/juiceshop_user:latest
@@ -102,10 +104,32 @@ services:
     depends_on:
       application-db:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
     ports:
       - "21501:21501"
+      - "21001:21001"
     networks:
       - app-network
+      - keycloak-network
+
+#  user-service:
+#    container_name: user_service
+#    build: C:/Users/lop97/Documents/SourceCodes/IdeaProjects/user_service
+#    restart: unless-stopped
+#    env_file:
+#      - environments/user.env
+#    depends_on:
+#      application-db:
+#        condition: service_healthy
+#      keycloak:
+#        condition: service_healthy
+#    ports:
+#      - "21501:21501"
+#      - "21001:21001"
+#    networks:
+#      - app-network
+#      - keycloak-network
 
   voucher-service:
     image: ghcr.io/nguyenphucminhkhang/juiceshop_voucher_service:latest
@@ -115,35 +139,16 @@ services:
       - environments/voucher.env
     ports:
       - "21502:21502"
+      - "21004:21004"
     depends_on:
       application-db:
         condition: service_healthy
     networks:
       - app-network
-#
-#  api-gateway:
-#    image: ghcr.io/konstannguyen/juiceshop_gateway:latest
-#    container_name: api_gateway
-#    restart: unless-stopped
-#    env_file:
-#      - environments/api_gateway.env
-#    ports:
-#      - "21500:21500"
-#    depends_on:
-#      user-service:
-#        condition: service_started
-#      core-service:
-#        condition: service_started
-#      voucher-service:
-#        condition: service_started
-#      keycloak:
-#        condition: service_healthy
-#    networks:
-#      - app-network
 
   api-gateway:
+    image: ghcr.io/konstannguyen/juiceshop_gateway:latest
     container_name: api_gateway
-    build: C:/Users/lop97/Documents/SourceCodes/IdeaProjects/api-gateway
     restart: unless-stopped
     env_file:
       - environments/api_gateway.env
@@ -160,6 +165,28 @@ services:
         condition: service_healthy
     networks:
       - app-network
+      - keycloak-network
+
+#  api-gateway:
+#    container_name: api_gateway
+#    build: C:/Users/lop97/Documents/SourceCodes/IdeaProjects/api-gateway
+#    restart: unless-stopped
+#    env_file:
+#      - environments/api_gateway.env
+#    ports:
+#      - "21500:21500"
+#    depends_on:
+#      user-service:
+#        condition: service_started
+#      core-service:
+#        condition: service_started
+#      voucher-service:
+#        condition: service_started
+#      keycloak:
+#        condition: service_healthy
+#    networks:
+#      - app-network
+#      - keycloak-network
 
   front-end:
     image: ghcr.io/konstannguyen/juiceshop_frontend:latest
