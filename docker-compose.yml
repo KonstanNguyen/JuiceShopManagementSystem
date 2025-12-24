@@ -45,6 +45,7 @@ services:
         condition: service_healthy
     networks:
       - keycloak-network
+      - app-network
 
   application-db:
     image: mysql:8.0
@@ -65,23 +66,8 @@ services:
     networks:
       - app-network
 
-#  core-service:
-#    image: ghcr.io/konstannguyen/juiceshop_core_service:latest
-#    container_name: core_service
-#    restart: unless-stopped
-#    env_file:
-#      - environments/core_service.env
-#    depends_on:
-#      application-db:
-#        condition: service_healthy
-#    ports:
-#      - "8082:8082"
-#      - "21002:21002"
-#    networks:
-#      - app-network
-
   core-service:
-    build: C:/Users/lop97/Documents/SourceCodes/IdeaProjects/core-service
+    image: ghcr.io/konstannguyen/juiceshop_core_service:latest
     container_name: core_service
     restart: unless-stopped
     env_file:
@@ -94,6 +80,21 @@ services:
       - "21002:21002"
     networks:
       - app-network
+
+#  core-service:
+#    build: C:/Users/lop97/Documents/SourceCodes/IdeaProjects/core-service
+#    container_name: core_service
+#    restart: unless-stopped
+#    env_file:
+#      - environments/core_service.env
+#    depends_on:
+#      application-db:
+#        condition: service_healthy
+#    ports:
+#      - "8082:8082"
+#      - "21002:21002"
+#    networks:
+#      - app-network
 
   user-service:
     image: ghcr.io/konstannguyen/juiceshop_user:latest
@@ -140,29 +141,9 @@ services:
     networks:
       - app-network
 
-#  api-gateway:
-#    image: ghcr.io/konstannguyen/juiceshop_gateway:latest
-#    container_name: api_gateway
-#    restart: unless-stopped
-#    env_file:
-#      - environments/api_gateway.env
-#    ports:
-#      - "21500:21500"
-#    depends_on:
-#      user-service:
-#        condition: service_started
-#      core-service:
-#        condition: service_started
-#      voucher-service:
-#        condition: service_started
-#      keycloak:
-#        condition: service_healthy
-#    networks:
-#      - app-network
-
   api-gateway:
+    image: ghcr.io/konstannguyen/juiceshop_gateway:latest
     container_name: api_gateway
-    build: C:/Users/lop97/Documents/SourceCodes/IdeaProjects/api-gateway
     restart: unless-stopped
     env_file:
       - environments/api_gateway.env
@@ -179,6 +160,26 @@ services:
         condition: service_healthy
     networks:
       - app-network
+
+#  api-gateway:
+#    container_name: api_gateway
+#    build: C:/Users/lop97/Documents/SourceCodes/IdeaProjects/api-gateway
+#    restart: unless-stopped
+#    env_file:
+#      - environments/api_gateway.env
+#    ports:
+#      - "21500:21500"
+#    depends_on:
+#      user-service:
+#        condition: service_started
+#      core-service:
+#        condition: service_started
+#      voucher-service:
+#        condition: service_started
+#      keycloak:
+#        condition: service_healthy
+#    networks:
+#      - app-network
 
   front-end:
     image: ghcr.io/konstannguyen/juiceshop_frontend:latest
